@@ -21,14 +21,16 @@ public class Teacher extends User {
     }
 
     public void uploadMaterial() {
-        JOptionPane.showMessageDialog(null, "Upload Material feature.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        // Replace the simple alert message option with the actual functional dialog window
+        UploadMaterial.showDialog(this);
     }
 
     public void gradeSubmission() {
-        JOptionPane.showMessageDialog(null, "Grade Submission feature.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        // THIS IS THE FIX: Call the actual GradeSubmission dialog instead of a popup
+        GradeSubmission.showDialog(this);
     }
-	public void uploadMaterial() {
-    // Replace the simple alert message option with the actual functional dialog window
-    UploadMaterial.showDialog(this);
-}
+	
+	
+	
+	
 }

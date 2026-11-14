@@ -46,7 +46,7 @@ public class Student extends User {
                 String dueDate = rs.getTimestamp("due_date") != null ? rs.getTimestamp("due_date").toString() : "N/A";
                 int maxPoints = rs.getInt("max_points");
                 String description = rs.getString("description");
-                
+
                 // Check if BLOB data exists in the 'file' column
                 byte[] blobCheck = rs.getBytes("file");
                 String fileStatus = (blobCheck != null && blobCheck.length > 0) ? "Available" : "No File";
@@ -152,7 +152,7 @@ public class Student extends User {
         if (content == null || content.trim().isEmpty()) return;
 
         String query = "INSERT INTO submission (id, content, submission_date, status, assignment_id, student_id) VALUES (?, ?, ?, ?, ?, ?)";
-        
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
@@ -181,7 +181,147 @@ public class Student extends User {
         JOptionPane.showMessageDialog(null, "Grades for " + getName() + ":\n• CS101 Lab 1: 95.5 / 100", "Student Grades", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    // =====================================================================
+    // FIXED: View course materials from the database with download support
+    // =====================================================================
     public void viewCourseMaterials() {
-        JOptionPane.showMessageDialog(null, "Course Materials for CS101:\n1. Chapter 1: Basics (PDF)\n2. Lab 1 Guidelines (PDF)", "Course Materials", JOptionPane.INFORMATION_MESSAGE);
+        String query = "SELECT id, title, type, course_id, description, file FROM material";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            String[] columnNames = {"Material ID", "Title", "Type", "Course ID", "Description", "Has File"};
+            DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            while (rs.next()) {
+                String id          = rs.getString("id");
+                String title       = rs.getString("title");
+                String type        = rs.getString("type");
+                String courseId    = rs.getString("course_id");
+                String description = rs.getString("description");
+
+                // Check if BLOB data exists in the 'file' column
+                byte[] blobCheck  = rs.getBytes("file");
+                String fileStatus = (blobCheck != null && blobCheck.length > 0) ? "Available" : "No File";
+
+                tableModel.addRow(new Object[]{id, title, type, courseId, description, fileStatus});
+            }
+
+            if (tableModel.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(null,
+                        "No course materials currently available.",
+                        "Course Materials", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            JTable table = new JTable(tableModel);
+            table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            table.setFillsViewportHeight(true);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setPreferredSize(new Dimension(750, 250));
+
+            JButton btnDownload = new JButton("Download Selected Material");
+
+            JPanel containerPanel = new JPanel(new BorderLayout(10, 10));
+            containerPanel.add(scrollPane, BorderLayout.CENTER);
+            containerPanel.add(btnDownload, BorderLayout.SOUTH);
+
+            btnDownload.addActionListener(e -> {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null,
+                            "Please select a material from the list to download.",
+                            "No Selection", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                String materialId = (String) tableModel.getValueAt(selectedRow, 0);
+                String title      = (String) tableModel.getValueAt(selectedRow, 1);
+                String type       = (String) tableModel.getValueAt(selectedRow, 2);
+                String fileStatus = (String) tableModel.getValueAt(selectedRow, 5);
+
+                if ("No File".equals(fileStatus)) {
+                    JOptionPane.showMessageDialog(null,
+                            "No file is attached to this material.",
+                            "File Not Found", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                downloadMaterialFile(materialId, title, type);
+            });
+
+            JOptionPane.showMessageDialog(null, containerPanel,
+                    "View & Download Course Materials", JOptionPane.PLAIN_MESSAGE);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // =====================================================================
+    // NEW: Helper method to retrieve binary data from the material 'file'
+    //      column and save it locally (mirrors downloadAssignmentFile).
+    // =====================================================================
+    private void downloadMaterialFile(String materialId, String title, String type) {
+        String query = "SELECT file FROM material WHERE id = ?";
+
+        // Build extension from the 'type' column (e.g. "PPTX" -> ".pptx")
+        String extension = ".bin";
+        if (type != null && !type.trim().isEmpty()) {
+            extension = "." + type.trim().toLowerCase();
+        }
+
+        String defaultFileName = title.replaceAll("[^a-zA-Z0-9.-]", "_") + extension;
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setSelectedFile(new File(defaultFileName));
+
+        if (fileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) return;
+        File targetFile = fileChooser.getSelectedFile();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, materialId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.next()) {
+                    JOptionPane.showMessageDialog(null,
+                            "Material not found in database.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                byte[] fileBytes = rs.getBytes("file");
+                if (fileBytes == null || fileBytes.length == 0) {
+                    JOptionPane.showMessageDialog(null,
+                            "The file in the database is empty.",
+                            "Download Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                try (FileOutputStream fos = new FileOutputStream(targetFile)) {
+                    fos.write(fileBytes);
+                }
+
+                JOptionPane.showMessageDialog(null,
+                        "Course material downloaded successfully!\nSaved to: " + targetFile.getAbsolutePath(),
+                        "Download Complete", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Failed to download file: " + ex.getMessage(),
+                    "Download Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
