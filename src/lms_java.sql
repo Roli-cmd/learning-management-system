@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2026 at 09:09 AM
+-- Generation Time: Nov 14, 2026 at 02:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -75,16 +75,17 @@ CREATE TABLE `course` (
   `name` varchar(255) NOT NULL,
   `code` varchar(50) NOT NULL,
   `description` text DEFAULT NULL,
-  `teacher_id` varchar(50) DEFAULT NULL
+  `teacher_id` varchar(50) DEFAULT NULL,
+  `class_link` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `course`
 --
 
-INSERT INTO `course` (`id`, `name`, `code`, `description`, `teacher_id`) VALUES
-('C101', 'Object-Oriented Programming', 'CS101', 'Introductory Java programming course.', 'T2001'),
-('C102', 'Object-Oriented Programming', 'CS102', 'Java programming course.', 'T2004');
+INSERT INTO `course` (`id`, `name`, `code`, `description`, `teacher_id`, `class_link`) VALUES
+('C101', 'Object-Oriented Programming', 'CS101', 'Introductory Java programming course.', 'T2001', 'https://www.java.com/en/'),
+('C102', 'Object-Oriented Programming', 'CS102', 'Java programming course.', 'T2001', 'https://www.w3schools.com/java/');
 
 -- --------------------------------------------------------
 
@@ -104,6 +105,7 @@ CREATE TABLE `course_enrollments` (
 
 INSERT INTO `course_enrollments` (`student_id`, `course_id`, `teacher_id`) VALUES
 ('ST01', 'C101', 'T2001'),
+('ST01', 'C102', NULL),
 ('ST05', 'C102', 'T2004');
 
 -- --------------------------------------------------------
@@ -207,6 +209,13 @@ CREATE TABLE `submission` (
   `assignment_id` varchar(50) NOT NULL,
   `student_id` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `submission`
+--
+
+INSERT INTO `submission` (`teacher_id`, `content`, `submission_date`, `status`, `assignment_id`, `student_id`) VALUES
+('T2001', 'https://www.deepseek.com/en/', '2026-11-14 09:49:09', 'SUBMITTED', 'ASG01', 'ST01');
 
 -- --------------------------------------------------------
 

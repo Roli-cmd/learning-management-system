@@ -21,16 +21,19 @@ public class Teacher extends User {
     }
 
     public void uploadMaterial() {
-        // Replace the simple alert message option with the actual functional dialog window
         UploadMaterial.showDialog(this);
     }
 
     public void gradeSubmission() {
-        // THIS IS THE FIX: Call the actual GradeSubmission dialog instead of a popup
         GradeSubmission.showDialog(this);
     }
-	
-	
-	
-	
+    
+    // NEW METHODS
+    public void joinClass() {
+        TeacherJoinClass.joinClass(this);
+    }
+
+    public void editClassLink() {
+        EditClassLink.showDialog(this);
+    }
 }

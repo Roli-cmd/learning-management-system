@@ -41,10 +41,12 @@ public class LoginFrame extends BaseFrame {
             return;
         }
 
-        String loginQuery = "SELECT u.id, u.name, u.email, u.role, t.teacher_id, s.student_id " +
+        // UPDATED: Added LEFT JOIN for admin table and selected a.admin_id
+        String loginQuery = "SELECT u.id, u.name, u.email, u.role, t.teacher_id, s.student_id, a.admin_id " +
                            "FROM user u " +
                            "LEFT JOIN teacher t ON u.id = t.user_id " +
                            "LEFT JOIN student s ON u.id = s.user_id " +
+                           "LEFT JOIN admin a ON u.id = a.user_id " +
                            "WHERE u.email = ? AND u.password = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -61,6 +63,7 @@ public class LoginFrame extends BaseFrame {
                     String role = rs.getString("role");
                     String teacherId = rs.getString("teacher_id");
                     String studentId = rs.getString("student_id");
+                    String adminId = rs.getString("admin_id");
 
                     showMessage("Login Successful! Welcome, " + name + ".", "Success", JOptionPane.INFORMATION_MESSAGE);
                     this.dispose();
@@ -77,8 +80,15 @@ public class LoginFrame extends BaseFrame {
                                 StudentGUI studentGUI = new StudentGUI(student);
                                 studentGUI.setVisible(true);
 
-                            } else {
-                                showMessage("Admin Portal View not implemented yet.", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                            } else if ("ADMIN".equalsIgnoreCase(role)) {
+                                // NEW: Launch Admin Dashboard
+                                Admin admin = new Admin(id, name, userEmail, adminId != null ? adminId : "A3001");
+                                AdminFrame adminFrame = new AdminFrame(admin);
+                                adminFrame.setVisible(true);
+                            } 
+							
+							else {
+                                showMessage("Unknown user role: " + role, "Notice", JOptionPane.WARNING_MESSAGE);
                             }
                         } catch (Exception ex) {
                             ex.printStackTrace();
