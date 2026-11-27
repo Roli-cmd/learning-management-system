@@ -11,22 +11,44 @@ public class TeacherGUI extends BaseFrame {
         super("LMS - Teacher Portal (" + teacher.getName() + ")", 400, 450); 
         this.currentTeacher = teacher;
 
-        // Profile Details Header
+        // --- COLOR THEME ---
+        Color orangeColor = new Color(255, 140, 0); // Vibrant Orange for buttons
+        Color bgColor = new Color(245, 245, 245);   // Light gray background
+
+        // Set main window background
+        this.getContentPane().setBackground(bgColor);
+
+        // --- Profile Details Header ---
         JPanel infoPanel = new JPanel(new GridLayout(3, 1));
+        infoPanel.setBackground(bgColor); // Match background
         infoPanel.setBorder(BorderFactory.createTitledBorder("Instructor Details"));
         infoPanel.add(new JLabel(" Instructor Name: " + currentTeacher.getName()));
         infoPanel.add(new JLabel(" Institutional Email: " + currentTeacher.getEmail()));
         infoPanel.add(new JLabel(" Faculty Staff ID: " + currentTeacher.getTeacherId()));
 
-        // Action Buttons Grid
+        // --- Action Buttons Grid ---
         JPanel btnPanel = new JPanel(new GridLayout(5, 1, 8, 8)); 
-        btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnPanel.setBackground(bgColor); // Match background
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 
         JButton btnJoinClass = new JButton("Join Class");
         JButton btnEditLink = new JButton("Edit Class Link");
         JButton btnUpload = new JButton("Upload Course Material");
         JButton btnCreateAsg = new JButton("Create Assignment Blueprint");
         JButton btnGrade = new JButton("Grade Student Submission");
+
+        // Array to easily style all buttons at once
+        JButton[] buttons = {btnJoinClass, btnEditLink, btnUpload, btnCreateAsg, btnGrade};
+        
+        for (JButton btn : buttons) {
+            btn.setBackground(orangeColor);           // Orange background
+            btn.setForeground(Color.WHITE);           // White text for contrast
+            btn.setFont(new Font("Arial", Font.BOLD, 13)); // Bold font
+            btn.setFocusPainted(false);               // Remove dotted outline
+            btn.setOpaque(true);                      // Ensure color renders
+            btn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Hand cursor on hover
+            btnPanel.add(btn);                        // Add to panel
+        }
 
         // Action Listeners
         btnJoinClass.addActionListener(e -> currentTeacher.joinClass());
@@ -37,12 +59,6 @@ public class TeacherGUI extends BaseFrame {
 
         btnCreateAsg.addActionListener(e -> currentTeacher.createAssignmentBlueprint());
         btnGrade.addActionListener(e -> currentTeacher.gradeSubmission());
-
-        btnPanel.add(btnJoinClass);
-        btnPanel.add(btnEditLink);
-        btnPanel.add(btnUpload);
-        btnPanel.add(btnCreateAsg);
-        btnPanel.add(btnGrade);
 
         add(infoPanel, BorderLayout.NORTH);
         add(btnPanel, BorderLayout.CENTER);

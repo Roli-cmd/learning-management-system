@@ -25,6 +25,13 @@ public class StudentGUI extends BaseFrame {
         JButton btnSubmit = new JButton("Submit Assignment");
         JButton btnGrades = new JButton("View Grades");
 
+        // Array to easily style all buttons at once
+        JButton[] buttons = {btnJoin, btnMaterials, btnViewAssignments, btnSubmit, btnGrades};
+        for (JButton btn : buttons) {
+            styleOrangeButton(btn);
+            btnPanel.add(btn);
+        }
+
         // Action Listeners
         btnJoin.addActionListener(e -> currentStudent.joinClass());
         btnMaterials.addActionListener(e -> currentStudent.viewCourseMaterials());
@@ -32,13 +39,17 @@ public class StudentGUI extends BaseFrame {
         btnSubmit.addActionListener(e -> currentStudent.submitAssignment());
         btnGrades.addActionListener(e -> currentStudent.viewGrades());
 
-        btnPanel.add(btnJoin);
-        btnPanel.add(btnMaterials);
-        btnPanel.add(btnViewAssignments);
-        btnPanel.add(btnSubmit);
-        btnPanel.add(btnGrades);
-
         add(infoPanel, BorderLayout.NORTH);
         add(btnPanel, BorderLayout.CENTER);
+    }
+
+    // --- Helper method to style buttons with orange ---
+    private void styleOrangeButton(JButton btn) {
+        btn.setBackground(Color.ORANGE);               // Orange background
+        btn.setForeground(Color.WHITE);                // White text for good contrast
+        btn.setFont(new Font("Arial", Font.BOLD, 14));
+        btn.setFocusPainted(false);                    // Remove focus outline
+        btn.setOpaque(true);                           // Required to show background color
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Hand cursor on hover
     }
 }

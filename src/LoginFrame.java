@@ -15,15 +15,27 @@ public class LoginFrame extends BaseFrame {
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
         formPanel.add(new JLabel("Email:"));
-        emailField = new JTextField("smith@univ.edu");
+        emailField = new JTextField("smith@univ.edu"); // You can change this to "" if you want it blank too
         formPanel.add(emailField);
 
         formPanel.add(new JLabel("Password:"));
-        passwordField = new JPasswordField("teacher123");
+        
+        // --- CHANGED: Removed "teacher123" so the password field is blank ---
+        passwordField = new JPasswordField(); 
+        
         formPanel.add(passwordField);
 
         JPanel btnPanel = new JPanel();
         JButton loginBtn = new JButton("Login");
+        
+        // --- BUTTON COLOR CUSTOMIZATION ---
+        loginBtn.setBackground(Color.ORANGE);      // Orange background
+        loginBtn.setForeground(Color.BLUE);        // Blue text
+        loginBtn.setFont(new Font("Arial", Font.BOLD, 14)); // Make text bold
+        loginBtn.setOpaque(true);                  // Required for custom background color to show
+        loginBtn.setFocusPainted(false);           // Removes the dotted focus outline
+        loginBtn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Changes cursor to a hand on hover
+        
         btnPanel.add(loginBtn);
 
         loginBtn.addActionListener(e -> authenticateUser());

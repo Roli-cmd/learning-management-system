@@ -23,6 +23,7 @@ public class AdminFrame extends BaseFrame {
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         JButton logoutBtn = new JButton("Logout");
+        styleOrangeButton(logoutBtn); // Apply orange style
         logoutBtn.addActionListener(e -> {
             dispose();
             new LoginFrame().setVisible(true);
@@ -39,18 +40,18 @@ public class AdminFrame extends BaseFrame {
 
         JButton viewLinkBtn = new JButton("View Class Link");
         viewLinkBtn.setPreferredSize(new Dimension(220, 45));
-        viewLinkBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        styleOrangeButton(viewLinkBtn); // Apply orange style
         viewLinkBtn.addActionListener(e -> JoinClasses.openClassLinkAsAdmin());
 
         JButton courseLinksBtn = new JButton("View Course Links");
         courseLinksBtn.setPreferredSize(new Dimension(220, 45));
-        courseLinksBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        styleOrangeButton(courseLinksBtn); // Apply orange style
         courseLinksBtn.addActionListener(e -> showCourseLinksTable());
 
         // NEW: Upload Material Button for Admin
         JButton uploadMaterialBtn = new JButton("Upload Material");
         uploadMaterialBtn.setPreferredSize(new Dimension(220, 45));
-        uploadMaterialBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        styleOrangeButton(uploadMaterialBtn); // Apply orange style
         uploadMaterialBtn.addActionListener(e -> openMaterialManagerAsAdmin());
 
         JLabel infoLabel1 = new JLabel("Look up a course by ID (e.g. C101) to open its class link.");
@@ -71,6 +72,16 @@ public class AdminFrame extends BaseFrame {
         gbc.gridy = 5; centerPanel.add(infoLabel3, gbc);
 
         add(centerPanel, BorderLayout.CENTER);
+    }
+
+    // --- Helper method to style buttons with orange ---
+    private void styleOrangeButton(JButton btn) {
+        btn.setBackground(Color.ORANGE);           // Orange background
+        btn.setForeground(Color.WHITE);            // White text for good contrast
+        btn.setFont(new Font("Arial", Font.BOLD, 14));
+        btn.setFocusPainted(false);                // Remove focus outline
+        btn.setOpaque(true);                       // Required to show background color
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Hand cursor on hover
     }
 
     // Admin flow to open the material manager
@@ -130,8 +141,11 @@ public class AdminFrame extends BaseFrame {
         });
 
         dialog.add(new JScrollPane(table), BorderLayout.CENTER);
+        
         JButton closeBtn = new JButton("Close");
+        styleOrangeButton(closeBtn); // Apply orange style to the Close button too
         closeBtn.addActionListener(e -> dialog.dispose());
+        
         JPanel bottom = new JPanel();
         bottom.add(closeBtn);
         dialog.add(bottom, BorderLayout.SOUTH);
